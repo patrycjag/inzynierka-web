@@ -7,7 +7,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
-import {Link} from 'react-router-dom';
 import Typography from '../components/Typography';
 
 const styles = theme => ({
@@ -24,36 +23,36 @@ const styles = theme => ({
   table: {
     minWidth: 650,
   },
-  button: {
-    marginTop: theme.spacing(1),
-    justifyContent: 'center',
-  },
   typography: {
     marginBottom: theme.spacing(4),
   },
+  button: {
+    width: "100%",
+    paddingTop: theme.spacing(1),
+  }
 });
-
-const useStateWithLocalStorage = localStorageKey => {
-  const [value, setValue] = React.useState(
-    localStorage.getItem(localStorageKey) || ''
-  );
-  React.useEffect(() => {
-    localStorage.setItem(localStorageKey, value);
-  }, [value]);
-  return [value, setValue];
-};
+//Save product in local storage
+const handleOnClick = ( id, name) => {
+  localStorage.setItem(id, name);
+}
 
 function ListOfShops(props) {
   const { classes } = props;
-
-  const [value, setValue] = useStateWithLocalStorage('ids');
-
   return (
     <div className={classes.root}>
       <Typography className={classes.typography} variant="h2" color="inherit" align="left">
         Lista sklepów:
       </Typography>
+
       <Paper className={classes.paper}>
+        <Button
+          className={classes.button}
+          variant="contained"
+          color="secondary"
+          onClick={ () => handleOnClick(props.productID, props.listOfShops[0][0].description)}
+        >
+          Dodaj przedmiot do koszyka
+        </Button>
         <Table aria-label="simple table">
            {props.listOfShops.map(list => {
              return (
@@ -63,7 +62,7 @@ function ListOfShops(props) {
                      <TableRow key={index}>
                        <TableCell align="left" scope="row">
                          <img
-                           style={{width: '100px', height: '100px'}}
+                           style={{height: '50px'}}
                            src={shop.imgUrl}
                            alt={shop.shopName}
                          />
@@ -75,28 +74,7 @@ function ListOfShops(props) {
                          {shop.description}
                        </TableCell>
                        <TableCell align="left" scope="row">
-                         {shop.price}
-                       </TableCell>
-                       <TableCell align="left" scope="row">
-                         <Button
-                           variant="contained"
-                           color="secondary"
-                           onClick={
-                             () => setValue(`${props.productID}`)
-                           }
-                         >
-                           Dodaj do koszyka
-                         </Button>
-                         <Link to={`/`}
-                               style={{textDecoration: 'none', color: 'white'}}>
-                           <Button
-                             variant="contained"
-                             color="primary"
-                             className={classes.button}
-                           >
-                             Idź do sklepu
-                           </Button>
-                         </Link>
+                        Cena: {shop.price} zł
                        </TableCell>
                      </TableRow>
                    );

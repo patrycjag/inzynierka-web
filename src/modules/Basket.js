@@ -1,9 +1,7 @@
 import withRoot from './withRoot';
 import React, { Component } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
 import TopTitle from './views/TopTitle';
 import ListOfSelectedProducts from './views/ListOfSelectedProducts';
 
@@ -12,34 +10,64 @@ class Basket extends Component {
     super(props);
     this.state = {
         listOfSelectedProducts: [],
-        listOfIds: "",
         listOfShops: [],
+        listOfIds: "",
+        oneShop: [],
+        loading: true,
     };
+    console.log("Loading true")
   }
-
-  fetchDeals = () => {
+//Load initial data
+  componentDidMount() {
     let str = this.state.listOfIds.substring(0, this.state.listOfIds.length - 1);
     fetch(`http://ec2-35-180-69-117.eu-west-3.compute.amazonaws.com/api/v1/product/${str}/deals`)
       .then(response => response.json())
       .then(result => {
                 this.setState({listOfShops: result,
                               listOfSelectedProducts: [],
-                              listOfIds: "",})
-                console.log(result)
+                              oneShop: [],
+                              listOfIds: "",
+                              loading: false})
+            })
+      .catch(e => {
+                console.log(e)
+            });
+  }
+  fetchDeals = () => {
+    this.setState({listOfSelectedProducts: [],
+                    listOfShops: [],
+                    listOfIds: "",
+                    oneShop: [],
+                    loading: true})
+    let str = this.state.listOfIds.substring(0, this.state.listOfIds.length - 1);
+    fetch(`http://ec2-35-180-69-117.eu-west-3.compute.amazonaws.com/api/v1/product/${str}/deals`)
+      .then(response => response.json())
+      .then(result => {
+                this.setState({listOfShops: result,
+                              listOfSelectedProducts: [],
+                              oneShop: [],
+                              listOfIds: "",
+                              loading: false})
             })
       .catch(e => {
                 console.log(e)
             });
   }
   fetchDealsWithDelivery = () => {
+    this.setState({listOfSelectedProducts: [],
+                    listOfShops: [],
+                    listOfIds: "",
+                    oneShop: [],
+                    loading: true})
     let str = this.state.listOfIds.substring(0, this.state.listOfIds.length - 1);
     fetch(`http://ec2-35-180-69-117.eu-west-3.compute.amazonaws.com/api/v1/product/${str}/deals?includeDelivery`)
       .then(response => response.json())
       .then(result => {
                 this.setState({listOfShops: result,
                               listOfSelectedProducts: [],
-                              listOfIds: "",})
-                console.log(result)
+                              oneShop: [],
+                              listOfIds: "",
+                              loading: false})
             })
       .catch(e => {
                 console.log(e)
@@ -47,23 +75,60 @@ class Basket extends Component {
   }
   fetchDealsSingleShop = () => {
     let str = this.state.listOfIds.substring(0, this.state.listOfIds.length - 1);
-    fetch(`http://ec2-35-180-69-117.eu-west-3.compute.amazonaws.com/api/v1/product/${str}/deals?includeDelivery&singleShop`)
+    fetch(`http://ec2-35-180-69-117.eu-west-3.compute.amazonaws.com/api/v1/product/${str}/deals?singleShop`)
+      .then(response => response.json())
+      .then(result => {
+        this.setState({oneShop: result,
+                      listOfSelectedProducts: [],
+                      listOfIds: "",
+                      loading: false})
+            })
+      .catch(e => {
+                console.log(e)
+            });
+    fetch(`http://ec2-35-180-69-117.eu-west-3.compute.amazonaws.com/api/v1/product/${str}/deals`)
       .then(response => response.json())
       .then(result => {
                 this.setState({listOfShops: result,
                               listOfSelectedProducts: [],
-                              listOfIds: "",})
-                console.log(result)
+                              listOfIds: "",
+                              loading: false})
             })
       .catch(e => {
                 console.log(e)
             });
   }
-
+  fetchDealsSingleShopWithDelivery = () => {
+    let str = this.state.listOfIds.substring(0, this.state.listOfIds.length - 1);
+    let oneShop = [];
+    fetch(`http://ec2-35-180-69-117.eu-west-3.compute.amazonaws.com/api/v1/product/${str}/deals?includeDelivery&singleShop`)
+      .then(response => response.json())
+      .then(result => {
+              this.setState({oneShop: result,
+                            listOfSelectedProducts: [],
+                            listOfIds: "",
+                            loading: false})
+            })
+      .catch(e => {
+                console.log(e)
+            });
+    fetch(`http://ec2-35-180-69-117.eu-west-3.compute.amazonaws.com/api/v1/product/${str}/deals?includeDelivery`)
+      .then(response => response.json())
+      .then(result => {
+                this.setState({listOfShops: result,
+                              listOfSelectedProducts: [],
+                              listOfIds: "",
+                              loading: false})
+            })
+      .catch(e => {
+                console.log(e)
+            });
+  }
   onClick = () => {
     localStorage.clear();
     this.setState({listOfShops: [],
                   listOfSelectedProducts: [],
+                  oneShop: [],
                   listOfIds: "",})
   }
 
@@ -84,9 +149,6 @@ class Basket extends Component {
       this.state.listOfSelectedProducts.push(value);
       this.state.listOfIds += key;
       this.state.listOfIds += ",";
-      // console.log the iteration key and value
-      console.log('Key: ' + key + ', Value: ' + value);
-
     }
     return (
       <React.Fragment>
@@ -94,7 +156,7 @@ class Basket extends Component {
           <TopTitle/>
         {
           this.state.listOfSelectedProducts.length > 0 ?
-              <ListOfSelectedProducts products={this.state.listOfSelectedProducts} shops={this.state.listOfShops}/>
+              <ListOfSelectedProducts loading={this.state.loading} products={this.state.listOfSelectedProducts} shops={this.state.listOfShops} oneShop={this.state.oneShop}/>
             :
               <div>
                <Typography color="textSecondary" align="center">
@@ -117,7 +179,7 @@ class Basket extends Component {
               style={{margin: "1em"}}
               onClick={this.fetchDeals}
             >
-              Licz najniższą cenę
+              Licz najniższą cenę całego koszyka
             </Button>
             <Button
               variant="contained"
@@ -125,15 +187,25 @@ class Basket extends Component {
               style={{margin: "1em"}}
               onClick={this.fetchDealsWithDelivery}
             >
-              Licz najniższą cenę z dostawą
+              Licz najniższą cenę całego koszyka razem z kosztami dostawy
             </Button>
+          </div>
+          <div>
             <Button
               variant="contained"
               color="secondary"
               style={{margin: "1em"}}
               onClick={this.fetchDealsSingleShop}
             >
-              Licz najniższą cenę z dostawą i jednego sklepu
+              Porównaj ceny z jednego sklepu vs z różnych
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              style={{margin: "1em"}}
+              onClick={this.fetchDealsSingleShopWithDelivery}
+            >
+              Porównaj ceny z jednego sklepu vs z różnych razem kosztami dostawy
             </Button>
           </div>
         </div>

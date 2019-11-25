@@ -2,7 +2,6 @@ import React  from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -11,6 +10,7 @@ import { withStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {Link, useHistory} from 'react-router-dom';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -59,6 +59,11 @@ const styles = theme => ({
     background: '#eaeff1',
     width: '100%',
   },
+  button: {
+    marginTop: theme.spacing(1),
+    marginLeft: theme.spacing(1),
+    justifyContent: 'center',
+  },
 });
 
 function Content(props) {
@@ -97,8 +102,6 @@ function Content(props) {
    localStorage.setItem(id, name);
  }
 
-console.log("List of products", props.listOfProducts);
-
   return (
       <div className={classes.root}>
         <CssBaseline />
@@ -118,7 +121,6 @@ console.log("List of products", props.listOfProducts);
                       onChange={handleChange}
                       onKeyPress={(ev) => {
                         if (ev.key === 'Enter') {
-                          console.log("Enter", product),
                           history.push(`/search/${product}`);
                           () => props.fetchData(product);
                         }
@@ -151,39 +153,54 @@ console.log("List of products", props.listOfProducts);
                   <TableBody className={classes.row}>
                   {props.listOfProducts.map((product, index) => {
                     const isItemSelected = isSelected(product.name);
-                    const labelId = 'enhanced-table-checkbox-${index}';
 
                     return (
                       <TableRow
                         key={index}
                         onClick={event => handleClick(event, product.name)}
                         selected={isItemSelected}>
-                        <Link to={`/productDetails/${product.sku}`}
-                              style={{textDecoration: 'none', color: 'white'}}>
-
-                        <TableCell align="left" scope="row">
-                          <img
-                            style={{width: '100px', height: '100px'}}
-                            src={product.image}
-                            alt={product.name}
-                          />
+                          <TableCell align="left" scope="row">
+                            <Link to={`/productDetails/${product.sku}`}
+                                style={{textDecoration: 'none', color: 'white'}}>
+                              <img
+                                style={{width: '100px', height: '100px'}}
+                                src={product.image}
+                                alt={product.name}
+                              />
+                            </Link>
+                          </TableCell>
+                          <TableCell align="left" scope="row">
+                            <Link to={`/productDetails/${product.sku}`}
+                                style={{textDecoration: 'none', color: 'black'}}>
+                            {product.name}
+                            </Link>
+                          </TableCell>
+                          <TableCell align="left" scope="row">
+                            <Link to={`/productDetails/${product.sku}`}
+                                style={{textDecoration: 'none', color: 'black'}}>
+                                Minimalna cena: {product.offers.lowPrice} zł
+                            </Link>
+                          </TableCell>
+                          <TableCell align="right" scope="row">
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              className={classes.button}
+                              onClick={ () => handleOnClick(product.sku, product.name)}
+                            >
+                              Dodaj do koszyka
+                            </Button>
+                            <Link to={`/productDetails/${product.sku}`}
+                                style={{textDecoration: 'none', color: 'white'}}>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  className={classes.button}
+                                >
+                                  Zobacz listę sklepów
+                                </Button>
+                            </Link>
                         </TableCell>
-                        <TableCell align="left" scope="row">
-                          {product.name}
-                        </TableCell>
-                        <TableCell align="left" scope="row">
-                          Minimalna cena: {product.offers.lowPrice} zł
-                        </TableCell>
-                      </Link>
-                      <TableCell align="left" scope="row">
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          onClick={ () => handleOnClick(product.sku, product.name)}
-                        >
-                          Dodaj do koszyka
-                        </Button>
-                      </TableCell>
                       </TableRow>
                     )
                   })}
@@ -191,9 +208,7 @@ console.log("List of products", props.listOfProducts);
               </Table>
               :
                 <div className={classes.contentWrapper}>
-                 <Typography color="textSecondary" align="center">
-                   Brak produktów
-                 </Typography>
+                 {props.loading && <CircularProgress />}
                 </div>
          }
             </div>

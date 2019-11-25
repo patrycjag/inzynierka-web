@@ -41,6 +41,7 @@ function ProductHero(props, context) {
   const { classes } = props;
   const [product, setProduct] = React.useState('Wpisz nazwę produtku');
   let history = useHistory();
+  //Check every change in search field
   const handleChange = event => {
     setProduct(event.target.value);
   };
@@ -64,15 +65,15 @@ function ProductHero(props, context) {
        />
        <Link to={`/search/${product}`}
              style={{textDecoration: 'none', color: 'white'}}>
-       <Button
-           color="secondary"
-           variant="contained"
-           size="large"
-           className={classes.button}
-         >
-           Szukaj
+         <Button
+             color="secondary"
+             variant="contained"
+             size="large"
+             className={classes.button}
+           >
+             Szukaj
          </Button>
-     </Link>
+      </Link>
       <Typography variant="body2" color="inherit" className={classes.more}>
         Odkryj naszą stronę
       </Typography>

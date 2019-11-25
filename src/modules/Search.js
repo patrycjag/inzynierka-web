@@ -8,16 +8,17 @@ class Search extends Component {
     this.fetchData = this.fetchData.bind(this)
     this.state = {
         listOfProducts: [],
+        loading: true,
     };
   }
-
+//load initial data
   componentDidMount() {
-    console.log(this.props.match);
     const productName = this.props.match.params.name;
     fetch('http://ec2-35-180-69-117.eu-west-3.compute.amazonaws.com/api/v1/product?productName='+productName)
       .then(response => response.json())
       .then(result => {
-                this.setState({listOfProducts: result})
+                this.setState({listOfProducts: result,
+                                loading: false})
             })
       .catch(e => {
                 console.log(e)
@@ -28,7 +29,8 @@ class Search extends Component {
     fetch('http://ec2-35-180-69-117.eu-west-3.compute.amazonaws.com/api/v1/product?productName='+product)
       .then(response => response.json())
       .then(result => {
-                this.setState({listOfProducts: result})
+                this.setState({listOfProducts: result,
+                              loading: false})
             })
       .catch(e => {
                 console.log(e)
@@ -36,10 +38,9 @@ class Search extends Component {
   }
 
   render() {
-    console.log("Products", this.state.listOfProducts)
     return (
       <React.Fragment>
-        <Content listOfProducts={this.state.listOfProducts} fetchData={this.fetchData}/>
+        <Content loading={this.state.loading} listOfProducts={this.state.listOfProducts} fetchData={this.fetchData}/>
       </React.Fragment>
     );
   }

@@ -1,5 +1,4 @@
 import withRoot from './withRoot';
-// --- Post bootstrap -----
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import AppFooter from './views/AppFooter';
@@ -10,6 +9,7 @@ import Search from './Search';
 import ProductDetails from './ProductDetails';
 import Basket from './Basket';
 
+//Home screen + app router
 class Home extends Component {
   render() {
     return (
